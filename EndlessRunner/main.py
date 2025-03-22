@@ -6,6 +6,12 @@ import math
 
 pygame.init()
 
+pygame.mixer.init() # for songs
+
+pygame.mixer.music.load(os.path.join("Assets/Sound_effects", "nyanCat_theme.mp3")) 
+
+pygame.mixer.music.play(-1)
+
 # Global Constants
 SCREEN_HEIGHT = 600
 SCREEN_WIDTH = 1100
