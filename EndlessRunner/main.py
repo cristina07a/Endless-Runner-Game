@@ -37,36 +37,73 @@ def draw_menu():
     
     pygame.display.update()
 
-def draw_options_menu():
+selected_index = 0
+characters = ["Frog", "Parrot", "Pig", "Sheep"]
+character_images = [pygame.image.load(os.path.join("Assets/Animal", char, "run1.png")) for char in characters]
+IMAGE_PATH = f"Assets/Animal/{characters[selected_index]}"
+
+
+def draw_options_menu(selected_index):
     SCREEN.blit(BG, (0, 0))
-    title = font.render("Options", True, BLACK)
+
+    title = font.render("Choose Your Character:", True, BLACK)
     SCREEN.blit(title, (SCREEN_WIDTH // 2 - title.get_width() // 2, 100))
 
-    # Here you can add any other settings or options if necessary in the future
-    options_text = font.render("This is the options menu.", True, BLACK)
-    SCREEN.blit(options_text, (SCREEN_WIDTH // 2 - options_text.get_width() // 2, 250))
+    spacing = 180  
+    total_width = spacing * len(characters)
+    start_x = (SCREEN_WIDTH - total_width) // 2
+
+    for i, char in enumerate(characters):
+        char_img = pygame.transform.scale(character_images[i], (100, 100))
+        img_x = start_x + i * spacing
+        img_y = 250
+
+        SCREEN.blit(char_img, (img_x, img_y))
+
+        # Evidențiază caracterul selectat
+        name_color = (200, 0, 0) if i == selected_index else BLACK
+        char_name = font.render(char, True, name_color)
+        SCREEN.blit(char_name, (img_x + 50 - char_name.get_width() // 2, img_y + 110))
 
     pygame.display.update()
 
 def options():
+    global selected_index, IMAGE_PATH, RUNNING, JUMPING, DUCKING
     run = True
     while run:
-        draw_options_menu()
+        draw_options_menu(selected_index)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN:
-                    run = False  # Go back to the main menu
+                if event.key == pygame.K_RIGHT:
+                    selected_index = (selected_index + 1) % len(characters)  # Navigare dreapta
+                elif event.key == pygame.K_LEFT:
+                    selected_index = (selected_index - 1) % len(characters)  # Navigare stânga
+                elif event.key == pygame.K_RETURN:
+                    IMAGE_PATH = f"Assets/Animal/{characters[selected_index]}"  # Setăm noul path
+                                        # Actualizează imagini pentru RUNNING, JUMPING și DUCKING
+                    RUNNING = [pygame.image.load(os.path.join(IMAGE_PATH, "run1.png")),
+                               pygame.image.load(os.path.join(IMAGE_PATH, "run2.png"))]
+                    JUMPING = pygame.image.load(os.path.join(IMAGE_PATH, "jump.png"))
+                    DUCKING = [pygame.image.load(os.path.join(IMAGE_PATH, "duck1.png")),
+                               pygame.image.load(os.path.join(IMAGE_PATH, "duck2.png"))]
+                    print(f"Character selected: {characters[selected_index]}, IMAGE_PATH set to {IMAGE_PATH}")
+                    run = False  # Ieșim din meniul de selecție
+
+def scale_image(image, factor):
+    width = int(image.get_width() * factor)
+    height = int(image.get_height() * factor)
+    return pygame.transform.scale(image, (width, height))
 
 
-RUNNING = [pygame.image.load(os.path.join("Assets/Dino", "DinoRun1.png")),
-           pygame.image.load(os.path.join("Assets/Dino", "DinoRun2.png"))]
-JUMPING = pygame.image.load(os.path.join("Assets/Dino", "DinoJump.png"))
-DUCKING = [pygame.image.load(os.path.join("Assets/Dino", "DinoDuck1.png")),
-           pygame.image.load(os.path.join("Assets/Dino", "DinoDuck2.png"))]
+RUNNING = [pygame.image.load(os.path.join(IMAGE_PATH, "run1.png")),
+           pygame.image.load(os.path.join(IMAGE_PATH, "run2.png"))]
+JUMPING = pygame.image.load(os.path.join(IMAGE_PATH, "jump.png"))
+DUCKING = [pygame.image.load(os.path.join(IMAGE_PATH, "duck1.png")),
+           pygame.image.load(os.path.join(IMAGE_PATH, "duck2.png"))]
 
 ROCK = [pygame.transform.scale(pygame.image.load(os.path.join("Assets/Other", "box.png")),(100, 100)),
                 pygame.transform.scale(pygame.image.load(os.path.join("Assets/Other", "rock1.PNG")),(100, 100)),
@@ -97,7 +134,7 @@ tiles = SCREEN_WIDTH // BG_SCROLL.get_width() + 2
 
 class Dinosaur:
     X_POS = 80
-    Y_POS = SCREEN_HEIGHT - GROUND_HEIGHT + 20  
+    Y_POS = SCREEN_HEIGHT - GROUND_HEIGHT + 45 
     Y_POS_DUCK = SCREEN_HEIGHT - GROUND_HEIGHT + 50  
     JUMP_VEL = 8.5
 
@@ -203,7 +240,7 @@ class Bird(Obstacle):
     def __init__(self, image):
         self.type = 0
         super().__init__(image, self.type)
-        self.rect.y = SCREEN_HEIGHT - GROUND_HEIGHT - 40
+        self.rect.y = SCREEN_HEIGHT - GROUND_HEIGHT - 20
         self.index = 0
 
     def draw(self, SCREEN):
@@ -291,7 +328,7 @@ def menu(death_count):
     game_options = ["Try Again", "Back to Menu", "Quit"]
 
     while run:        
-        if death_count == 0:  # When game hasn't been played yet
+        if death_count == 0:  # game hasn't been played yet
             draw_menu()  # Show the main menu
 
             for event in pygame.event.get():
