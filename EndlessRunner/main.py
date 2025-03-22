@@ -12,6 +12,56 @@ SCREEN_WIDTH = 1100
 SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Dino Game with Scrolling Background")
 
+BG = pygame.image.load(os.path.join("Assets/Other", "fundal.png"))
+BG = pygame.transform.scale(BG, (SCREEN_WIDTH, SCREEN_HEIGHT))
+
+# Colors
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+
+# Fonts
+font = pygame.font.Font('freesansbold.ttf', 40)
+# Menu options
+menu_options = ["Play", "Options", "Quit"]
+selected_option = 0
+
+def draw_menu():
+    SCREEN.blit(BG, (0, 0))
+    title = font.render("Endless Runner", True, BLACK)
+    SCREEN.blit(title, (SCREEN_WIDTH // 2 - title.get_width() // 2, 100))
+    
+    for i, option in enumerate(menu_options):
+        color = (200, 0, 0) if i == selected_option else BLACK
+        text = font.render(option, True, color)
+        SCREEN.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, 250 + i * 60))
+    
+    pygame.display.update()
+
+def draw_options_menu():
+    SCREEN.blit(BG, (0, 0))
+    title = font.render("Options", True, BLACK)
+    SCREEN.blit(title, (SCREEN_WIDTH // 2 - title.get_width() // 2, 100))
+
+    # Here you can add any other settings or options if necessary in the future
+    options_text = font.render("This is the options menu.", True, BLACK)
+    SCREEN.blit(options_text, (SCREEN_WIDTH // 2 - options_text.get_width() // 2, 250))
+
+    pygame.display.update()
+
+def options():
+    run = True
+    while run:
+        draw_options_menu()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    run = False  # Go back to the main menu
+
+
 RUNNING = [pygame.image.load(os.path.join("Assets/Dino", "DinoRun1.png")),
            pygame.image.load(os.path.join("Assets/Dino", "DinoRun2.png"))]
 JUMPING = pygame.image.load(os.path.join("Assets/Dino", "DinoJump.png"))
@@ -225,7 +275,7 @@ def main():
             obstacle.draw(SCREEN)
             obstacle.update()
             if player.dino_rect.colliderect(obstacle.rect):
-                pygame.time.delay(2000)
+                pygame.time.delay(10)
                 death_count += 1
                 menu(death_count)
 
@@ -236,31 +286,67 @@ def main():
 
 
 def menu(death_count):
-    global points
+    global selected_option
     run = True
-    while run:
-        SCREEN.fill((255, 255, 255))
-        font = pygame.font.Font('freesansbold.ttf', 30)
+    game_options = ["Try Again", "Back to Menu", "Quit"]
 
-        if death_count == 0:
-            text = font.render("Press any Key to Start", True, (0, 0, 0))
-        elif death_count > 0:
-            text = font.render("Press any Key to Restart", True, (0, 0, 0))
+    while run:        
+        if death_count == 0:  # When game hasn't been played yet
+            draw_menu()  # Show the main menu
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    exit()
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_DOWN:
+                        selected_option = (selected_option + 1) % len(game_options)
+                    elif event.key == pygame.K_UP:
+                        selected_option = (selected_option - 1) % len(game_options)
+                    elif event.key == pygame.K_RETURN:
+                        if selected_option == 0:  # Play
+                            main()  # Restart the game
+                        elif selected_option == 1:  # Options
+                            options()
+                        elif selected_option == 2:
+                            pygame.quit()
+                            exit()
+
+            pygame.display.update()
+
+
+        elif death_count > 0:  # After losing
+            text = font.render("You lost!", True, (0, 0, 0))
             score = font.render("Your Score: " + str(points), True, (0, 0, 0))
             scoreRect = score.get_rect()
             scoreRect.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 50)
+            SCREEN.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, SCREEN_HEIGHT // 2 - 50))
             SCREEN.blit(score, scoreRect)
-        textRect = text.get_rect()
-        textRect.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
-        SCREEN.blit(text, textRect)
-        SCREEN.blit(RUNNING[0], (SCREEN_WIDTH // 2 - 20, SCREEN_HEIGHT // 2 - 140))
-        pygame.display.update()
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                run = False
-            if event.type == pygame.KEYDOWN:
-                main()
+            
+            for i, option in enumerate(game_options):
+                color = (200, 0, 0) if i == selected_option else BLACK
+                text = font.render(option, True, color)
+                SCREEN.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, SCREEN_HEIGHT // 2 + 150 + i * 45))
+
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        exit()
+                    elif event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_DOWN:
+                            selected_option = (selected_option + 1) % len(game_options)
+                        elif event.key == pygame.K_UP:
+                            selected_option = (selected_option - 1) % len(game_options)
+                        elif event.key == pygame.K_RETURN:
+                            if selected_option == 0:  # "Try Again"
+                                main()  # Restart the game
+                            elif selected_option == 1:  # "Back to Menu"
+                                menu(0)  # Go back to the main menu after a loss
+                            elif selected_option == 2:
+                                pygame.quit()
+                                exit()
+
+                pygame.display.update()
 
 
-menu(death_count=0)
+menu(death_count = 0)
