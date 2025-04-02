@@ -12,22 +12,21 @@ pygame.mixer.music.load(os.path.join("Assets/Sound_effects", "nyanCat_theme.mp3"
 
 pygame.mixer.music.play(-1)
 
-# Global Constants
 SCREEN_HEIGHT = 600
 SCREEN_WIDTH = 1100
 SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("Dino Game with Scrolling Background")
+pygame.display.set_caption("Endless Runner")
 
-BG = pygame.image.load(os.path.join("Assets/Other", "fundal.png"))
+BG = pygame.image.load(os.path.join("Assets/Other", "fundal2.png"))
 BG = pygame.transform.scale(BG, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
-# Colors
-WHITE = (255, 255, 255)
+#WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
-# Fonts
 font = pygame.font.Font('freesansbold.ttf', 40)
-# Menu options
+
+
+# MENU
 menu_options = ["Play", "Options", "Quit"]
 selected_option = 0
 
@@ -66,7 +65,7 @@ def draw_options_menu(selected_index):
 
         SCREEN.blit(char_img, (img_x, img_y))
 
-        # Evidențiază caracterul selectat
+        # highlight character
         name_color = (200, 0, 0) if i == selected_index else BLACK
         char_name = font.render(char, True, name_color)
         SCREEN.blit(char_name, (img_x + 50 - char_name.get_width() // 2, img_y + 110))
@@ -85,19 +84,18 @@ def options():
                 exit()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RIGHT:
-                    selected_index = (selected_index + 1) % len(characters)  # Navigare dreapta
+                    selected_index = (selected_index + 1) % len(characters)  # go left
                 elif event.key == pygame.K_LEFT:
-                    selected_index = (selected_index - 1) % len(characters)  # Navigare stânga
+                    selected_index = (selected_index - 1) % len(characters)  # go right
                 elif event.key == pygame.K_RETURN:
-                    IMAGE_PATH = f"Assets/Animal/{characters[selected_index]}"  # Setăm noul path
-                                        # Actualizează imagini pentru RUNNING, JUMPING și DUCKING
+                    IMAGE_PATH = f"Assets/Animal/{characters[selected_index]}" 
                     RUNNING = [pygame.image.load(os.path.join(IMAGE_PATH, "run1.png")),
                                pygame.image.load(os.path.join(IMAGE_PATH, "run2.png"))]
                     JUMPING = pygame.image.load(os.path.join(IMAGE_PATH, "jump.png"))
                     DUCKING = [pygame.image.load(os.path.join(IMAGE_PATH, "duck1.png")),
                                pygame.image.load(os.path.join(IMAGE_PATH, "duck2.png"))]
                     print(f"Character selected: {characters[selected_index]}, IMAGE_PATH set to {IMAGE_PATH}")
-                    run = False  # Ieșim din meniul de selecție
+                    run = False 
 
 def scale_image(image, factor):
     width = int(image.get_width() * factor)
@@ -124,16 +122,17 @@ BIRD = [pygame.transform.scale(pygame.image.load(os.path.join("Assets/Bird", "bi
                                ]
 
 
-# Load and scale scrolling background
+# scrolling background and ground :
+
+# background
 BG_SCROLL = pygame.image.load(os.path.join("Assets/Other", "fundal.png")).convert()
 BG_SCROLL = pygame.transform.scale(BG_SCROLL, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
-# Load and scale scrolling ground
+# ground
 GROUND = pygame.image.load(os.path.join("Assets/Other", "dirt4.png")).convert_alpha()
 GROUND_HEIGHT = 210
 GROUND = pygame.transform.scale(GROUND, (SCREEN_WIDTH, GROUND_HEIGHT))
 
-# Background and ground scrolling variables
 scroll = 0
 ground_scroll = 0
 tiles = SCREEN_WIDTH // BG_SCROLL.get_width() + 2
@@ -257,7 +256,7 @@ class Bird(Obstacle):
 
 
 def background():
-    global scroll, ground_scroll
+    global scroll, ground_scroll # for controlling movement of the background and ground
     for i in range(tiles):
         SCREEN.blit(BG_SCROLL, (i * BG_SCROLL.get_width() + scroll, 0))
     for i in range(tiles):
@@ -297,7 +296,7 @@ def main():
             if event.type == pygame.QUIT:
                 run = False
 
-        SCREEN.fill((255, 255, 255))
+        #SCREEN.fill((255, 255, 255))
         userInput = pygame.key.get_pressed()
 
         background()
@@ -335,7 +334,7 @@ def menu(death_count):
 
     while run:        
         if death_count == 0:  # game hasn't been played yet
-            draw_menu()  # Show the main menu
+            draw_menu()  # main menu
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -347,9 +346,9 @@ def menu(death_count):
                     elif event.key == pygame.K_UP:
                         selected_option = (selected_option - 1) % len(game_options)
                     elif event.key == pygame.K_RETURN:
-                        if selected_option == 0:  # Play
-                            main()  # Restart the game
-                        elif selected_option == 1:  # Options
+                        if selected_option == 0:  # play
+                            main()  
+                        elif selected_option == 1:  # options
                             options()
                         elif selected_option == 2:
                             pygame.quit()
@@ -358,7 +357,7 @@ def menu(death_count):
             pygame.display.update()
 
 
-        elif death_count > 0:  # After losing
+        elif death_count > 0:  # after losing
             text = font.render("You lost!", True, (0, 0, 0))
             score = font.render("Your Score: " + str(points), True, (0, 0, 0))
             scoreRect = score.get_rect()
@@ -381,10 +380,10 @@ def menu(death_count):
                         elif event.key == pygame.K_UP:
                             selected_option = (selected_option - 1) % len(game_options)
                         elif event.key == pygame.K_RETURN:
-                            if selected_option == 0:  # "Try Again"
-                                main()  # Restart the game
-                            elif selected_option == 1:  # "Back to Menu"
-                                menu(0)  # Go back to the main menu after a loss
+                            if selected_option == 0:  # try again
+                                main()  #restart
+                            elif selected_option == 1:  # back to menu
+                                menu(0)  # return to main menu after loss
                             elif selected_option == 2:
                                 pygame.quit()
                                 exit()
