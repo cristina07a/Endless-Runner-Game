@@ -97,10 +97,7 @@ def options():
                     print(f"Character selected: {characters[selected_index]}, IMAGE_PATH set to {IMAGE_PATH}")
                     run = False 
 
-def scale_image(image, factor):
-    width = int(image.get_width() * factor)
-    height = int(image.get_height() * factor)
-    return pygame.transform.scale(image, (width, height))
+
 
 
 RUNNING = [pygame.image.load(os.path.join(IMAGE_PATH, "run1.png")),
