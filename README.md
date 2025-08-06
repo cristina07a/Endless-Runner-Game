@@ -1,9 +1,14 @@
+## Authors
+
+This project was developed by [Cristina07a](https://github.com/cristina07a) and [AndreeaSafta](https://github.com/AndreeaSafta).
+
 ## Introduction
 
 A simple endless runner video game created using **Pygame**.
 The project is inspired by the offline **Dinosaur game** that appears in Google Chrome when there is no internet connection.
 
-Watch this video in order to see a gameplay using a controller.
+Watch [this](https://github.com/cristina07a/Endless-Runner-Game/blob/main/EndlessRunnerController.mp4) video in order to see a gameplay using a controller.
+
 ## Added functionalities:
 
 1. The game can be played using a controller or the keyboard, depending on the version chosen.
